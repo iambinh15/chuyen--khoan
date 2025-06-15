@@ -1,45 +1,203 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Chuyển khoản ngân hàng</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px;
+    :root {
+      --bg-color-dark: #121212;
+      --card-color-dark: #1f1f1f;
+      --text-color-dark: #f5f5f5;
+
+      --bg-color-light: #e0f7fa;
+      --card-color-light: #ffffff;
+      --text-color-light: #222;
+
+      --accent: #00bfa5;
     }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-color-dark);
+      color: var(--text-color-dark);
+      transition: background 0.3s, color 0.3s;
+      overflow: hidden;
+    }
+
+    body.light-mode {
+      background: var(--bg-color-light);
+      color: var(--text-color-light);
+    }
+
+    .background-icons {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .icon {
+      position: absolute;
+      opacity: 0.15;
+      animation: float linear infinite;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+      }
+      100% {
+        transform: translateY(-150px) rotate(360deg);
+      }
+    }
+
+    .icon1  { left: 5%;  font-size: 20px; animation-duration: 20s; animation-delay: 0s; }
+    .icon2  { left: 15%; font-size: 22px; animation-duration: 18s; animation-delay: 2s; }
+    .icon3  { left: 25%; font-size: 18px; animation-duration: 22s; animation-delay: 1s; }
+    .icon4  { left: 35%; font-size: 20px; animation-duration: 19s; animation-delay: 3s; }
+    .icon5  { left: 45%; font-size: 20px; animation-duration: 21s; animation-delay: 1.5s; }
+    .icon6  { left: 55%; font-size: 20px; animation-duration: 23s; animation-delay: 0.5s; }
+    .icon7  { left: 65%; font-size: 22px; animation-duration: 25s; animation-delay: 2.5s; }
+    .icon8  { left: 75%; font-size: 20px; animation-duration: 20s; animation-delay: 4s; }
+    .icon9  { left: 85%; font-size: 20px; animation-duration: 22s; animation-delay: 0s; }
+    .icon10 { left: 95%; font-size: 20px; animation-duration: 18s; animation-delay: 3.5s; }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 380px;
+      margin: 30px auto;
+      padding: 20px;
+      background: var(--card-color-dark);
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      transition: background 0.3s;
+    }
+
+    body.light-mode .container {
+      background: var(--card-color-light);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: var(--accent);
+      font-size: 20px;
+    }
+
+    p, label {
+      font-size: 14px;
+      margin: 10px 0;
+    }
+
+    input {
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      margin-top: 8px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      text-align: center;
+    }
+
     .qr-box {
       margin-top: 20px;
     }
-    img {
-      border: 2px solid #ccc;
-      border-radius: 10px;
+
+    .qr-box img {
+      width: 250px;
+      height: 250px;
+      border: 2px solid var(--accent);
+      border-radius: 12px;
     }
-    input {
-      padding: 10px;
-      width: 200px;
-      font-size: 16px;
-      margin-bottom: 20px;
-      text-align: center; /* ✅ Căn giữa văn bản trong ô input */
+
+    .toggle-mode {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      z-index: 10;
+      transition: background 0.3s;
+    }
+
+    .toggle-mode:hover {
+      background: #009e8a;
+    }
+
+    .contact-button {
+      position: fixed;
+      top: 60px;
+      right: 15px;
+      background: #ff4081;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      z-index: 10;
+      transition: background 0.3s;
+    }
+
+    .contact-button:hover {
+      background: #e91e63;
+    }
+
+    @media (max-height: 650px) {
+      .qr-box img {
+        width: 200px;
+        height: 200px;
+      }
     }
   </style>
 </head>
 <body>
-<h2>(❁´◡`❁)Thông tin chuyển khoản (❁´◡`❁)</h2>
 
-<p><strong>Ngân hàng:</strong> MB</p>
-<p><strong>Số tài khoản:</strong> 0389415404</p>
-<p><strong>Tên người nhận:</strong> CHU DINH BINH</p>
+<!-- Nút Chế độ sáng/tối -->
+<button class="toggle-mode" onclick="toggleMode()">Chế độ sáng/tối</button>
 
-<label for="amountInput"><strong>Nhập số tiền (VND):</strong></label><br>
-<input type="text" id="amountInput" placeholder="VD: 1000000" value="0"><br>
+<!-- Nút Liên hệ -->
+<button class="contact-button" onclick="window.location.href='mailto:iambinh.tech@gmail.com'">Liên hệ ngay</button>
 
-<p><strong>Nội dung:</strong> CHUYỂN TIỀN TỚI BINHCHUDZTOP1SERVER</p>
+<!-- Nền động icon -->
+<div class="background-icons">
+  <div class="icon icon1">💰</div>
+  <div class="icon icon2">💳</div>
+  <div class="icon icon3">🏧</div>
+  <div class="icon icon4">📲</div>
+  <div class="icon icon5">🪙</div>
+  <div class="icon icon6">💵</div>
+  <div class="icon icon7">🏦</div>
+  <div class="icon icon8">🤑</div>
+  <div class="icon icon9">💸</div>
+  <div class="icon icon10">📈</div>
+</div>
 
-<div class="qr-box">
-  <h3>Quét mã QR để chuyển khoản:</h3>
-  <img id="qr-image" width="400" height="400" alt="QR chuyển khoản">
+<!-- Nội dung chính -->
+<div class="container">
+  <h2>(❁´◡`❁) Thông tin chuyển khoản</h2>
+
+  <p><strong>Ngân hàng:</strong> MB</p>
+  <p><strong>Số tài khoản:</strong> 0389415404</p>
+  <p><strong>Tên người nhận:</strong> CHU DINH BINH</p>
+
+  <label for="amountInput"><strong>Nhập số tiền (VND):</strong></label>
+  <input type="text" id="amountInput" placeholder="VD: 1000000" value="0" />
+
+  <p><strong>Nội dung:</strong> CHUYỂN TIỀN TỚI BINHCHUDZTOP1SERVER</p>
+
+  <div class="qr-box">
+    <h3>Quét mã QR để chuyển khoản:</h3>
+    <img id="qr-image" alt="QR chuyển khoản">
+  </div>
 </div>
 
 <script>
@@ -65,7 +223,6 @@
     qrImage.src = qrUrl;
   }
 
-
   amountInput.addEventListener('input', () => {
     const raw = getRawAmount(amountInput.value);
     amountInput.value = formatVND(raw);
@@ -77,6 +234,10 @@
 
   amountInput.value = formatVND(getRawAmount(amountInput.value));
   updateQR();
+
+  function toggleMode() {
+    document.body.classList.toggle('light-mode');
+  }
 </script>
 </body>
 </html>
